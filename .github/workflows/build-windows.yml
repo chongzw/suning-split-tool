@@ -1,0 +1,57 @@
+name: Build Windows Executable
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt
+        pip install pyinstaller
+    
+    - name: Build executable
+      run: |
+        pyinstaller --onefile --windowed --name="苏宁对账单拆分工具" suning_split_gui.py
+    
+    - name: Upload Windows executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: windows-executable
+        path: dist/苏宁对账单拆分工具.exe
+    
+    - name: Create Release
+      if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/苏宁对账单拆分工具.exe
+        tag_name: v${{ github.run_number }}
+        name: Release v${{ github.run_number }}
+        body: |
+          Windows版本的苏宁对账单拆分工具
+          
+          ## 功能特点
+          - 支持拖拽Excel文件
+          - 自动按司机拆分对账单
+          - 格式化输出Excel文件
+          
+          ## 使用方法
+          1. 下载 `苏宁对账单拆分工具.exe`
+          2. 双击运行
+          3. 拖拽或选择Excel文件
+          4. 点击拆分按钮
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

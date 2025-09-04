@@ -1,0 +1,1 @@
+([('苏宁对账单拆分工具', '/Users/chongzewei/wms/dist/苏宁对账单拆分工具', 'EXECUTABLE')],)
